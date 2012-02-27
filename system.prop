@@ -1,9 +1,9 @@
-# system.prop for x41t
+# system.prop for stylistic
 ro.sf.lcd_density=160
 ro.sf.install_non_market_apps=1
 keyguard.no_require_sim=1
 wifi.supplicant_scan_interval=120
-backlight.brightness_file=/sys/class/backlight/thinkpad_screen/brightness
-backlight.max_brightness_file=/sys/class/backlight/thinkpad_screen/max_brightness
+backlight.brightness_file=/sys/class/backlight/acpi_video0/brightness
+backlight.max_brightness_file=/sys/class/backlight/acpi_video0/max_brightness
 persist.sys.ui.hw=true
-# end system.prop for x41t
+# end system.prop for stylistic

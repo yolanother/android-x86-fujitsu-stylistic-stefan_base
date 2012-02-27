@@ -1,2 +1,2 @@
-add_lunch_combo thinkpad_x41t-eng
-add_lunch_combo thinkpad_x41t-user
+add_lunch_combo fujitsu_stylistic-eng
+add_lunch_combo fujitsu_stylistic-user

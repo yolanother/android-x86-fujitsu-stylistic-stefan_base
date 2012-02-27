@@ -7,9 +7,9 @@ PRODUCT_PACKAGES += su Superuser FileManager libchromium_net alsa_amixer radioop
 
 $(call inherit-product,$(SRC_TARGET_DIR)/product/generic_x86.mk)
 
-PRODUCT_NAME := thinkpad_x41t
-PRODUCT_DEVICE := x41t
-PRODUCT_MANUFACTURER := ibm
+PRODUCT_NAME := fujitsu_stylistic
+PRODUCT_DEVICE := stylistic
+PRODUCT_MANUFACTURER := fujitsu
 
 DEVICE_PACKAGE_OVERLAYS := $(LOCAL_PATH)/overlays
 

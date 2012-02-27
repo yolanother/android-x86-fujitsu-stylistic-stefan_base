@@ -1,5 +1,5 @@
 on boot
-    chown system system /sys/class/backlight/thinkpad_screen/brightness
+    chown system system /sys/class/backlight/acpi_video0/brightness
 
     setkeycode 0x6d 115
     setkeycode 0x6e 114
