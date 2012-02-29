@@ -17,12 +17,13 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/ueventd.$(TARGET_PRODUCT).rc:root/ueventd.$(TARGET_PRODUCT).rc \
     $(LOCAL_PATH)/wacom-input.idc:system/usr/idc/wacom-input.idc \
     $(LOCAL_PATH)/AT_Translated_Set_2_keyboard.idc:system/usr/idc/AT_Translated_Set_2_keyboard.idc \
+    $(LOCAL_PATH)/bootanimation.zip:system/media/bootanimation.zip
 
-#PRODUCT_COPY_FILES += \
-#    $(LOCAL_PATH)/system/etc/permissions/features.xml:system/etc/permissions/features.xml \
-#    $(LOCAL_PATH)/system/etc/permissions/com.google.android.media.effects.xml:system/etc/permissions/com.google.android.media.effects.xml \
-#    $(LOCAL_PATH)/system/etc/permissions/com.google.android.maps.xml:system/etc/permissions/com.google.android.maps.xml \
-#    $(LOCAL_PATH)/system/framework/com.google.android.maps.jar:system/framework/com.google.android.maps.jar \
-#    $(LOCAL_PATH)/system/framework/com.google.android.media.effects.jar:system/framework/com.google.android.media.effects.jar
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/system/etc/permissions/features.xml:system/etc/permissions/features.xml \
+    $(LOCAL_PATH)/system/etc/permissions/com.google.android.media.effects.xml:system/etc/permissions/com.google.android.media.effects.xml \
+    $(LOCAL_PATH)/system/etc/permissions/com.google.android.maps.xml:system/etc/permissions/com.google.android.maps.xml \
+    $(LOCAL_PATH)/system/framework/com.google.android.maps.jar:system/framework/com.google.android.maps.jar \
+    $(LOCAL_PATH)/system/framework/com.google.android.media.effects.jar:system/framework/com.google.android.media.effects.jar
 
 include $(call all-subdir-makefiles)
