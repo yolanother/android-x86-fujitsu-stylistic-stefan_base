@@ -1,0 +1,151 @@
+From 044b431c2e9b550a791c8997e33999f1edf5663d Mon Sep 17 00:00:00 2001
+From: Aaron Jackson <a1.jackson@sta.samsung.com>
+Date: Thu, 1 Mar 2012 16:26:52 -0600
+Subject: [PATCH] Altered to make rotation work.
+
+
+diff --git a/core/java/android/view/WindowOrientationListener.java b/core/java/android/view/WindowOrientationListener.java
+index c3c74a7..47fe332 100755
+--- a/core/java/android/view/WindowOrientationListener.java
++++ b/core/java/android/view/WindowOrientationListener.java
+@@ -350,6 +350,128 @@ public abstract class WindowOrientationListener {
+ 
+         @Override
+         public void onSensorChanged(SensorEvent event) {
++            final boolean log = true;//mOrientationListener.mLogEnabled;
++
++            // The vector given in the SensorEvent points straight up (towards the sky) under ideal
++            // conditions (the phone is not accelerating).  I'll call this up vector elsewhere.
++            float x = event.values[ACCELEROMETER_DATA_X];
++            float y = event.values[ACCELEROMETER_DATA_Y];
++            float z = event.values[ACCELEROMETER_DATA_Z];
++
++            if (log) {
++                Slog.v(TAG, "Raw acceleration vector: " +
++                        "x=" + x + ", y=" + y + ", z=" + z);
++            }
++
++            // Apply a low-pass filter to the acceleration up vector in cartesian space.
++            // Reset the orientation listener state if the samples are too far apart in time
++            // or when we see values of (0, 0, 0) which indicates that we polled the
++            // accelerometer too soon after turning it on and we don't have any data yet.
++            final long now = event.timestamp;
++
++            mLastTimestamp = now;
++            mLastFilteredX = x;
++            mLastFilteredY = y;
++            mLastFilteredZ = z;
++
++            final int oldProposedRotation = getProposedRotation();
++            // Calculate the magnitude of the acceleration vector.
++            final float magnitude = (float) Math.sqrt(x * x + y * y + z * z);
++            if (magnitude < MIN_ACCELERATION_MAGNITUDE
++                    || magnitude > MAX_ACCELERATION_MAGNITUDE) {
++                if (log) {
++                    Slog.v(TAG, "Ignoring sensor data, magnitude out of range: "
++                            + "magnitude=" + magnitude);
++                }
++                clearProposal();
++            } else {
++                // Calculate the tilt angle.
++                // This is the angle between the up vector and the x-y plane (the plane of
++                // the screen) in a range of [-90, 90] degrees.
++                //   -90 degrees: screen horizontal and facing the ground (overhead)
++                //     0 degrees: screen vertical
++                //    90 degrees: screen horizontal and facing the sky (on table)
++                final int tiltAngle = (int) Math.round(
++                        Math.asin(z / magnitude) * RADIANS_TO_DEGREES);
++
++                // If the tilt angle is too close to horizontal then we cannot determine
++                // the orientation angle of the screen.
++                if (Math.abs(tiltAngle) > MAX_TILT) {
++                    if (log) {
++                        Slog.v(TAG, "Ignoring sensor data, tilt angle too high: "
++                                + "magnitude=" + magnitude + ", tiltAngle=" + tiltAngle);
++                    }
++                    clearProposal();
++                } else {
++                    // Calculate the orientation angle.
++                    // This is the angle between the x-y projection of the up vector onto
++                    // the +y-axis, increasing clockwise in a range of [0, 360] degrees.
++                    int orientationAngle = (int) Math.round(
++                            -Math.atan2(-x, y) * RADIANS_TO_DEGREES);
++                    if (orientationAngle < 0) {
++                        // atan2 returns [-180, 180]; normalize to [0, 360]
++                        orientationAngle += 360;
++                    }
++
++                    // Find the nearest rotation.
++                    int nearestRotation = (orientationAngle + 45) / 90;
++                    if (nearestRotation == 4) {
++                        nearestRotation = 0;
++                    }
++
++                    // Determine the proposed orientation.
++                    // The confidence of the proposal is 1.0 when it is ideal and it
++                    // decays exponentially as the proposal moves further from the ideal
++                    // angle, tilt and magnitude of the proposed orientation.
++                    if (!isTiltAngleAcceptable(nearestRotation, tiltAngle)
++                            || !isOrientationAngleAcceptable(nearestRotation,
++                                    orientationAngle)) {
++                        if (log) {
++                            Slog.v(TAG, "Ignoring sensor data, no proposal: "
++                                    + "magnitude=" + magnitude + ", tiltAngle=" + tiltAngle
++                                    + ", orientationAngle=" + orientationAngle);
++                        }
++                        clearProposal();
++                    } else {
++                        if (log) {
++                            Slog.v(TAG, "Proposal: "
++                                    + "magnitude=" + magnitude
++                                    + ", tiltAngle=" + tiltAngle
++                                    + ", orientationAngle=" + orientationAngle
++                                    + ", proposalRotation=" + mProposalRotation);
++                        }
++                        updateProposal(nearestRotation, now / 1000000L,
++                                magnitude, tiltAngle, orientationAngle);
++                    }
++                }
++            }
++            mProposalAgeMS = SETTLE_TIME_MS;
++
++            // Write final statistics about where we are in the orientation detection process.
++            final int proposedRotation = getProposedRotation();
++            if (log) {
++                final float proposalConfidence = Math.min(
++                        mProposalAgeMS * 1.0f / SETTLE_TIME_MS, 1.0f);
++                Slog.v(TAG, "Result: currentRotation=" + mOrientationListener.mCurrentRotation
++                        + ", proposedRotation=" + proposedRotation
++                        + ", proposalRotation=" + mProposalRotation
++                        + ", proposalAgeMS=" + mProposalAgeMS
++                        + ", proposalConfidence=" + proposalConfidence);
++            }
++
++            // Tell the listener.
++            if (proposedRotation != oldProposedRotation && proposedRotation >= 0) {
++                if (log) {
++                    Slog.v(TAG, "Proposed rotation changed!  proposedRotation=" + proposedRotation
++                            + ", oldProposedRotation=" + oldProposedRotation);
++                }
++                mOrientationListener.onProposedRotationChanged(proposedRotation);
++            }
++        }
++
++/*
++        @Override
++        public void onSensorChanged(SensorEvent event) {
+             final boolean log = mOrientationListener.mLogEnabled;
+ 
+             // The vector given in the SensorEvent points straight up (towards the sky) under ideal
+@@ -490,6 +612,8 @@ public abstract class WindowOrientationListener {
+             }
+         }
+ 
++     */
++
+         /**
+          * Returns true if the tilt angle is acceptable for a proposed
+          * orientation transition.
+-- 
+1.7.4.1
+
