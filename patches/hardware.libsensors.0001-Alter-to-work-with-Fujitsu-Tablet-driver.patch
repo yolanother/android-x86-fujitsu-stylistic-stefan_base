@@ -1,0 +1,38 @@
+From 7bb5cb9869aab995ba996d1bff056d1a839af1c6 Mon Sep 17 00:00:00 2001
+From: Aaron Jackson <a1.jackson@sta.samsung.com>
+Date: Thu, 1 Mar 2012 16:29:31 -0600
+Subject: [PATCH] Alter to work with Fujitsu-Tablet driver
+
+
+diff --git a/kbdsensor.cpp b/kbdsensor.cpp
+index bdbc463..993820b 100644
+--- a/kbdsensor.cpp
++++ b/kbdsensor.cpp
+@@ -92,7 +92,7 @@ SensorPollContext::SensorPollContext(const struct hw_module_t *module, struct hw
+ 			}
+ 
+ 			// TODO: parse /etc/excluded-input-devices.xml
+-			if (!strcmp(name, "AT Translated Set 2 keyboard")) {
++			if (!strncmp(name, "Fujitsu", 7)) {
+ 				LOGI("open %s ok", name);
+ 				break;
+ 			}
+@@ -199,6 +199,15 @@ int SensorPollContext::poll_poll(struct sensors_poll_device_t *dev, sensors_even
+ 				case FN_ROT_270:
+ 					rot = ROT_270;
+ 					break;
++                case 153:
++                    if(iev.value) {
++                        continue;
++                    }
++                    rot = ctx->rotation + 1;
++                    if(rot > ROT_270) {
++                        rot = ROT_0;
++                    }
++                    break;
+ #if 0
+ 				case KEY_ESC:
+ 					iev.code = KEY_LEFTMETA;
+-- 
+1.7.4.1
+
