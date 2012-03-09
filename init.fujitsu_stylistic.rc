@@ -15,10 +15,6 @@ service wacom-input /system/bin/wacom-input
     disabled
     oneshot
 
-service tablet-mode /system/bin/tablet-mode
-    disabled
-    oneshot
-
 service amixer-pcm /system/bin/alsa_amixer set PCM 100 on
     disabled
     oneshot
@@ -35,5 +31,3 @@ on property:dev.bootcomplete=1
     chmod 660 /sys/class/rfkill/rfkill0/state
     chown system bluetooth /sys/class/rfkill/rfkill0/state
 
-on property:sys.boot_completed=1
-    start tablet-mode

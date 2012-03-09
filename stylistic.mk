@@ -2,7 +2,7 @@ PRODUCT_PACKAGES := $(THIRD_PARTY_APPS)
 PRODUCT_PACKAGES += lights.default
 PRODUCT_PACKAGES += sensors.$(TARGET_PRODUCT)
 PRODUCT_PACKAGES += wacom-input
-PRODUCT_PACKAGES += tablet-mode
+#PRODUCT_PACKAGES += tablet-mode
 PRODUCT_PACKAGES += su Superuser FileManager alsa_amixer radiooptions rild libreference-ril libjni_pinyinime PinyinIME
 
 $(call inherit-product,$(SRC_TARGET_DIR)/product/generic_x86.mk)

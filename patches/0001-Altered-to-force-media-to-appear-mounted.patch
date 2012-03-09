@@ -1,0 +1,31 @@
+From 0d5ee5ec068aaf2d23146bc83a517f9317b43d04 Mon Sep 17 00:00:00 2001
+From: Aaron Jackson <a1.jackson@sta.samsung.com>
+Date: Fri, 9 Mar 2012 08:38:45 -0600
+Subject: [PATCH] Altered to force media to appear mounted.
+
+
+diff --git a/core/java/android/os/Environment.java b/core/java/android/os/Environment.java
+index 11f9445..22f2229 100644
+--- a/core/java/android/os/Environment.java
++++ b/core/java/android/os/Environment.java
+@@ -416,14 +416,9 @@ public class Environment {
+      * <p>See {@link #getExternalStorageDirectory()} for more information.
+      */
+     public static String getExternalStorageState() {
+-        try {
+-            IMountService mountService = IMountService.Stub.asInterface(ServiceManager
+-                    .getService("mount"));
+-            return mountService.getVolumeState(getExternalStorageDirectory()
+-                    .toString());
+-        } catch (Exception rex) {
+-            return Environment.MEDIA_REMOVED;
+-        }
++        // We're using an internal hdd in x86. This means media is always
++        // mounted.
++        return Environment.MEDIA_MOUNTED;
+     }
+ 
+     /**
+-- 
+1.7.4.1
+
