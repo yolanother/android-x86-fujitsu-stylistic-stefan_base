@@ -7,9 +7,10 @@ PRODUCT_PACKAGES += su Superuser FileManager alsa_amixer radiooptions rild libre
 
 $(call inherit-product,$(SRC_TARGET_DIR)/product/generic_x86.mk)
 
-PRODUCT_NAME := fujitsu_stylistic
+PRODUCT_NAME := Stylistic
 PRODUCT_DEVICE := stylistic
-PRODUCT_MANUFACTURER := fujitsu
+PRODUCT_MANUFACTURER := Fujitsu
+PRODUCT_MODEL := ST5022
 
 DEVICE_PACKAGE_OVERLAYS := $(LOCAL_PATH)/overlays
 

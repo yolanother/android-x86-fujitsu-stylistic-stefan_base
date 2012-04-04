@@ -62,6 +62,7 @@ void wacom_report_event(__u16 type, __u16 code, __s32 value) {
 	ev.type = type;
 	ev.code = code;
 	ev.value = value;
+
 	if (write(fd, &ev, sizeof(struct input_event)) < 0)
 		perror("error: write");
 }
@@ -225,6 +226,31 @@ int main(int argc, char** argv) {
 				state.values[WACOMFIELD_POSITION_Y].nValue);
 		wacom_report_event(EV_ABS, ABS_PRESSURE,
 				state.values[WACOMFIELD_PRESSURE].nValue);
+
+        //fprintf(stdout, "WACOMFIELD_BUTTONS: %d\n", state.values[WACOMFIELD_BUTTONS].nValue);
+
+        switch(state.values[WACOMFIELD_BUTTONS].nValue) {
+            case 32:
+            case WACOMBUTTON_STYLUS:
+                wacom_report_event(EV_KEY, BTN_STYLUS, state.values[WACOMFIELD_PRESSURE].nValue > minPress);
+                break;
+            case (32 | 64):
+            case WACOMBUTTON_STYLUS2:
+                wacom_report_event(EV_KEY, BTN_STYLUS2, state.values[WACOMFIELD_PRESSURE].nValue > minPress);
+                break;
+        }
+
+        //fprintf(stdout, "WACOMFIELD_TOOLTYPE: %d\n", state.values[WACOMFIELD_TOOLTYPE].nValue);
+
+        switch(state.values[WACOMFIELD_TOOLTYPE].nValue) {
+            case WACOMTOOLTYPE_PEN:
+                wacom_report_event(EV_KEY, BTN_TOOL_PEN, state.values[WACOMFIELD_PRESSURE].nValue > minPress);
+                break;
+            case WACOMTOOLTYPE_ERASER:
+                wacom_report_event(EV_KEY, BTN_TOOL_RUBBER, state.values[WACOMFIELD_PRESSURE].nValue > minPress);
+                break;
+        }
+                
 		wacom_report_event(EV_KEY, BTN_TOUCH,
 				state.values[WACOMFIELD_PRESSURE].nValue > minPress);
 		//        wacom_report_event(EV_KEY, BTN_RIGHT,    state.values[WACOMFIELD_BUTTONS].nValue == WACOMBUTTON_STYLUS);
