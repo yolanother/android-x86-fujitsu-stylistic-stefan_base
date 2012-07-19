@@ -1,2 +1,2 @@
-add_lunch_combo fujitsu_stylistic-eng
-add_lunch_combo fujitsu_stylistic-user
+add_lunch_combo Stylistic-eng
+add_lunch_combo Stylistic-user
